@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recipe Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .container {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            width: 90%; /* Adjusted width for responsiveness */
+            max-width: 800px; /* Maximum width */
+            margin: 20px; /* Added margin */
+            overflow: hidden; /* Prevents horizontal overflow */
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px; /* Adjusted font size */
+        }
+
+        img {
+            display: block;
+            margin: 0 auto;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            max-width: 100%; /* Ensure the image is responsive */
+            height: auto;
+            margin-bottom: 20px; /* Added margin */
+        }
+
+        h2 {
+            color: #555;
+            margin-top: 20px;
+            font-size: 20px; /* Adjusted font size */
+        }
+
+        ul {
+            list-style-type: none;
+            padding: 0;
+            margin-top: 10px; /* Added margin */
+        }
+
+        li {
+            margin-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            font-size: 16px; /* Adjusted font size */
+        }
+
+        form {
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+
+        input[type="datetime-local"] {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 10px;
+            width: calc(50% - 12px); /* Adjusted width for responsiveness */
+            display: inline-block; /* Ensure inputs are on the same line */
+            box-sizing: border-box; /* Ensure padding and border are included in width */
+        }
+
+        button[type="submit"] {
+            padding: 10px 20px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        @media only screen and (max-width: 600px) {
+            .container {
+                width: 95%;
+            }
+
+            h1 {
+                font-size: 20px; /* Adjusted font size for smaller screens */
+            }
+
+            h2 {
+                font-size: 18px; /* Adjusted font size for smaller screens */
+            }
+
+            li {
+                font-size: 14px; /* Adjusted font size for smaller screens */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>{{ recipe['label'] }}</h1>
+        <img src="{{ recipe['image'] }}" alt="{{ recipe['label'] }}">
+        <h2>Ingredients</h2>
+        <ul>
+            {% for ingredient in recipe['ingredients'] %}
+                <li>{{ ingredient['text'] }}</li>
+            {% endfor %}
+        </ul>
+        
+        <!-- Add form for adding to calendar here -->
+        <form action="/add_to_calendar" method="post" onsubmit="return validateForm()">
+            <input type="hidden" name="title" value="{{ recipe['label'] }}">
+            <input type="hidden" name="description" value="{% for ingredient in recipe['ingredients'] %}{{ ingredient['text'] }}{% if not loop.last %}, {% endif %}{% endfor %}">
+            <label for="start_datetime">Start Date & Time:</label>
+            <input type="datetime-local" id="start_datetime" name="start_datetime" required>
+            <label for="end_datetime">End Date & Time:</label>
+            <input type="datetime-local" id="end_datetime" name="end_datetime" required>
+            <span id="datetimeError" class="error-message"></span>
+            <input type="email" id="user_email" name="user_email" placeholder="Your Email" required>
+            <button type="submit">Add to Calendar</button>
+        </form>
+    </div>
+
+    <script>
+        function validateForm() {
+            var startDateTime = new Date(document.getElementById("start_datetime").value);
+            var endDateTime = new Date(document.getElementById("end_datetime").value);
+
+            if (endDateTime <= startDateTime) {
+                document.getElementById("datetimeError").innerText = "End Date & Time must be greater than Start Date & Time";
+                return false;
+            } else {
+                document.getElementById("datetimeError").innerText = "";
+                return true;
+            }
+        }
+    </script>
+</body>
+</html>
